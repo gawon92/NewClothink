@@ -20,7 +20,6 @@
         <Button
             android:id="@+id/closet2"
             android:background="@drawable/closetonbtn"
-            android:layout_marginLeft="30dp"
             android:visibility="gone"
             android:layout_width="150dp"
             android:layout_height="190dp" />
@@ -34,7 +33,6 @@
         <Button
             android:id="@+id/addbtn2"
             android:background="@drawable/closetplusbtn"
-            android:layout_marginLeft="30dp"
             android:visibility="invisible"
             android:layout_width="150dp"
             android:layout_height="190dp" />
@@ -43,7 +41,6 @@
 
     <LinearLayout
         android:id="@+id/linear2"
-        android:layout_marginTop="20dp"
         android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -57,7 +54,6 @@
         <Button
             android:id="@+id/closet4"
             android:background="@drawable/closetonbtn"
-            android:layout_marginLeft="30dp"
             android:visibility="gone"
             android:layout_width="150dp"
             android:layout_height="190dp" />
@@ -71,7 +67,6 @@
         <Button
             android:id="@+id/addbtn4"
             android:background="@drawable/closetplusbtn"
-            android:layout_marginLeft="30dp"
             android:visibility="invisible"
             android:layout_width="150dp"
             android:layout_height="190dp" />
