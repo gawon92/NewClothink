@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center">
+
+    <LinearLayout
+        android:id="@+id/linear1"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/closet1"
+            android:background="@drawable/closetbtn"
+            android:visibility="gone"
+            android:layout_width="150dp"
+            android:layout_height="190dp" />
+        <Button
+            android:id="@+id/closet2"
+            android:background="@drawable/closetbtn"
+            android:layout_marginLeft="30dp"
+            android:visibility="gone"
+            android:layout_width="150dp"
+            android:layout_height="190dp" />
+
+        <Button
+            android:id="@+id/addbtn1"
+            android:background="@drawable/addbtn"
+            android:visibility="invisible"
+            android:layout_width="150dp"
+            android:layout_height="190dp" />
+        <Button
+            android:id="@+id/addbtn2"
+            android:background="@drawable/addbtn"
+            android:layout_marginLeft="30dp"
+            android:visibility="invisible"
+            android:layout_width="150dp"
+            android:layout_height="190dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linear2"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/closet3"
+            android:background="@drawable/closetbtn"
+            android:visibility="gone"
+            android:layout_width="150dp"
+            android:layout_height="190dp" />
+        <Button
+            android:id="@+id/closet4"
+            android:background="@drawable/closetbtn"
+            android:layout_marginLeft="30dp"
+            android:visibility="gone"
+            android:layout_width="150dp"
+            android:layout_height="190dp" />
+
+        <Button
+            android:id="@+id/addbtn3"
+            android:background="@drawable/addbtn"
+            android:visibility="invisible"
+            android:layout_width="150dp"
+            android:layout_height="190dp" />
+        <Button
+            android:id="@+id/addbtn4"
+            android:background="@drawable/addbtn"
+            android:layout_marginLeft="30dp"
+            android:visibility="invisible"
+            android:layout_width="150dp"
+            android:layout_height="190dp" />
+    </LinearLayout>
+
+
+</LinearLayout>
+
+
+
