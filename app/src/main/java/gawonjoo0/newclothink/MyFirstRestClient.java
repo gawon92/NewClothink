@@ -8,7 +8,7 @@ import com.loopj.android.http.RequestParams;
  * Created by USER on 2016-10-19.
  */
 public class MyFirstRestClient {
-    private static final String BASE_URL="http://192.168.100.128:7777/Middle";
+    private static final String BASE_URL="http://172.30.1.39:7777/Middle";
 //    private static final String BASE_URL="http://172.30.1.32:7777/Middle";
 
     private static AsyncHttpClient client=new AsyncHttpClient();
