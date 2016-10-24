@@ -57,6 +57,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
     String str3="빨간옷은 빨간옷끼리";
     String str4="노란옷은 노란옷끼리";
 
+//    가워니 즐이다~~~~~~~!
+
     private ArrayList<String> arrayGroup=new ArrayList<String>();;
     private HashMap<String, ArrayList<String>> arrayChild=new HashMap<String, ArrayList<String>>();
 
