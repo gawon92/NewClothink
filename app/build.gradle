@@ -25,4 +25,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.0'
     compile 'com.loopj.android:android-async-http:1.4.9'
     compile files('libs/android-async-http-1.4.9.jar')
+    compile 'com.tsengvn:Typekit:1.0.0'
 }

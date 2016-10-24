@@ -1,13 +1,18 @@
 package gawonjoo0.newclothink;
 
-import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -19,38 +24,42 @@ import java.util.StringTokenizer;
 import cz.msebera.android.httpclient.Header;
 
 /**
- * Created by USER on 2016-10-21.
+ * Created by jooyoung on 2016-10-22.
  */
 
-public class Closet extends Activity{
+public class ClosetActivity extends Fragment {
 
     public int count1,count2=0;
 
     public static int dataNum=0;
 
-    private Button [] closet=new Button[4];
+    private Button[] closet=new Button[4];
     private Button [] addbtn=new Button[4];
 
     private ClosetDto infoDto;
 
     StringTokenizer stk1,stk2;
 
-    ArrayList <String> allList = new ArrayList<String>();
+    ArrayList<String> allList = new ArrayList<String>();
     public static ArrayList <ClosetDto> closetInfo;
 
     private int result=0;
 
     ClosetDto closetDto;
 
+
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.closet);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        View view=inflater.inflate(R.layout.closet_layout,container,false);
 
         closetInfo=new ArrayList<ClosetDto>();
 
-        RequestParams params=new RequestParams();
+
+        RequestParams params = new RequestParams();
         params.add("cmd", "dataGet");
+
 
         MyFirstRestClient.post("/pb", params, new AsyncHttpResponseHandler() {
             @Override
@@ -82,28 +91,29 @@ public class Closet extends Activity{
 
             @Override
             public void onFailure(int i, cz.msebera.android.httpclient.Header[] headers, byte[] bytes, Throwable throwable) {
-                Toast.makeText(getApplicationContext(), "연결실패", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity().getApplicationContext(), "연결실패", Toast.LENGTH_SHORT).show();
 
             }
         });
 
-        closet[0]=(Button)findViewById(R.id.closet1);
-        closet[1]=(Button)findViewById(R.id.closet2);
-        closet[2]=(Button)findViewById(R.id.closet3);
-        closet[3]=(Button)findViewById(R.id.closet4);
+        closet[0]=(Button) view.findViewById(R.id.closet1);
+        closet[1]=(Button) view.findViewById(R.id.closet2);
+        closet[2]=(Button) view.findViewById(R.id.closet3);
+        closet[3]=(Button) view.findViewById(R.id.closet4);
 
-        addbtn[0]=(Button)findViewById(R.id.addbtn1);
-        addbtn[1]=(Button)findViewById(R.id.addbtn2);
-        addbtn[2]=(Button)findViewById(R.id.addbtn3);
-        addbtn[3]=(Button)findViewById(R.id.addbtn4);
+        addbtn[0]=(Button) view.findViewById(R.id.addbtn1);
+        addbtn[1]=(Button) view.findViewById(R.id.addbtn2);
+        addbtn[2]=(Button) view.findViewById(R.id.addbtn3);
+        addbtn[3]=(Button) view.findViewById(R.id.addbtn4);
 
 
         for(count1=0;count1<4;count1++){
             addbtn[count1].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final EditText closet_name = new EditText(Closet.this);
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(Closet.this);
+                    final EditText closet_name = new EditText(getActivity().getApplicationContext());
+                    closet_name.setTextColor(Color.parseColor("#4d4d4d"));
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
                     dialog.setTitle("옷장정보 입력").setMessage("옷장의 이름을 지정해주세요!")
                             .setNegativeButton("Yes!", new DialogInterface.OnClickListener() {
                                 @Override
@@ -128,14 +138,14 @@ public class Closet extends Activity{
                                             result = Integer.parseInt(info.trim());
 
                                             if (result != 0) {
-                                                Toast.makeText(getApplicationContext(), "[ " + closetDto.getName() + " ]의 옷장 만들어짐!", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(getActivity().getApplicationContext(), "[ " + closetDto.getName() + " ]의 옷장 만들어짐!", Toast.LENGTH_SHORT).show();
                                             }
 
                                         }
 
                                         @Override
                                         public void onFailure(int i, Header[] headers, byte[] bytes, Throwable throwable) {
-                                            Toast.makeText(getApplicationContext(), "연결실패", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getActivity().getApplicationContext(), "연결실패", Toast.LENGTH_SHORT).show();
 
                                         }
                                     });
@@ -160,7 +170,7 @@ public class Closet extends Activity{
         closet[0].setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                AlertDialog.Builder dialog = new AlertDialog.Builder(Closet.this);
+                AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
                 dialog.setTitle("삭제").setMessage("정말 삭제하시겠습니까?")
                         .setNegativeButton("Yes!", new DialogInterface.OnClickListener() {
                             @Override
@@ -179,13 +189,13 @@ public class Closet extends Activity{
                                             closetInfo.remove(0);
                                             dataNum -= 1;
                                             viewDisplay(dataNum);
-                                            Toast.makeText(getApplicationContext(), "삭제되었습니다!", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getActivity().getApplicationContext(), "삭제되었습니다!", Toast.LENGTH_SHORT).show();
                                         }
                                     }
 
                                     @Override
                                     public void onFailure(int i, cz.msebera.android.httpclient.Header[] headers, byte[] bytes, Throwable throwable) {
-                                        Toast.makeText(getApplicationContext(), "연결실패", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getActivity().getApplicationContext(), "연결실패", Toast.LENGTH_SHORT).show();
 
                                     }
                                 });
@@ -195,7 +205,7 @@ public class Closet extends Activity{
                         .setPositiveButton("No!", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(getApplicationContext(), "삭제되지않았습니다!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity().getApplicationContext(), "삭제되지않았습니다!", Toast.LENGTH_SHORT).show();
                             }
                         }).create().show();
 
@@ -206,7 +216,7 @@ public class Closet extends Activity{
         closet[1].setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                AlertDialog.Builder dialog = new AlertDialog.Builder(Closet.this);
+                AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
                 dialog.setTitle("삭제").setMessage("정말 삭제하시겠습니까?")
                         .setNegativeButton("Yes!", new DialogInterface.OnClickListener() {
                             @Override
@@ -225,13 +235,13 @@ public class Closet extends Activity{
                                             closetInfo.remove(1);
                                             dataNum -= 1;
                                             viewDisplay(dataNum);
-                                            Toast.makeText(getApplicationContext(), "삭제되었습니다!", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getActivity().getApplicationContext(), "삭제되었습니다!", Toast.LENGTH_SHORT).show();
                                         }
                                     }
 
                                     @Override
                                     public void onFailure(int i, cz.msebera.android.httpclient.Header[] headers, byte[] bytes, Throwable throwable) {
-                                        Toast.makeText(getApplicationContext(), "연결실패", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getActivity().getApplicationContext(), "연결실패", Toast.LENGTH_SHORT).show();
 
                                     }
                                 });
@@ -241,7 +251,7 @@ public class Closet extends Activity{
                         .setPositiveButton("No!", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(getApplicationContext(), "삭제되지않았습니다!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity().getApplicationContext(), "삭제되지않았습니다!", Toast.LENGTH_SHORT).show();
                             }
                         }).create().show();
 
@@ -252,7 +262,7 @@ public class Closet extends Activity{
         closet[2].setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                AlertDialog.Builder dialog = new AlertDialog.Builder(Closet.this);
+                AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
                 dialog.setTitle("삭제").setMessage("정말 삭제하시겠습니까?")
                         .setNegativeButton("Yes!", new DialogInterface.OnClickListener() {
                             @Override
@@ -272,13 +282,13 @@ public class Closet extends Activity{
                                             closetInfo.remove(2);
                                             dataNum -= 1;
                                             viewDisplay(dataNum);
-                                            Toast.makeText(getApplicationContext(), "삭제되었습니다!", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getActivity().getApplicationContext(), "삭제되었습니다!", Toast.LENGTH_SHORT).show();
                                         }
                                     }
 
                                     @Override
                                     public void onFailure(int i, cz.msebera.android.httpclient.Header[] headers, byte[] bytes, Throwable throwable) {
-                                        Toast.makeText(getApplicationContext(), "연결실패", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getActivity().getApplicationContext(), "연결실패", Toast.LENGTH_SHORT).show();
 
                                     }
                                 });
@@ -288,7 +298,7 @@ public class Closet extends Activity{
                         .setPositiveButton("No!", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(getApplicationContext(), "삭제되지않았습니다!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity().getApplicationContext(), "삭제되지않았습니다!", Toast.LENGTH_SHORT).show();
                             }
                         }).create().show();
 
@@ -299,7 +309,7 @@ public class Closet extends Activity{
         closet[3].setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                AlertDialog.Builder dialog = new AlertDialog.Builder(Closet.this);
+                AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
                 dialog.setTitle("삭제").setMessage("정말 삭제하시겠습니까?")
                         .setNegativeButton("Yes!", new DialogInterface.OnClickListener() {
                             @Override
@@ -318,13 +328,13 @@ public class Closet extends Activity{
                                             closetInfo.remove(3);
                                             dataNum -= 1;
                                             viewDisplay(dataNum);
-                                            Toast.makeText(getApplicationContext(), "삭제되었습니다!", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getActivity().getApplicationContext(), "삭제되었습니다!", Toast.LENGTH_SHORT).show();
                                         }
                                     }
 
                                     @Override
                                     public void onFailure(int i, cz.msebera.android.httpclient.Header[] headers, byte[] bytes, Throwable throwable) {
-                                        Toast.makeText(getApplicationContext(), "연결실패", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getActivity().getApplicationContext(), "연결실패", Toast.LENGTH_SHORT).show();
 
                                     }
                                 });
@@ -334,7 +344,7 @@ public class Closet extends Activity{
                         .setPositiveButton("No!", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(getApplicationContext(), "삭제되지않았습니다!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getActivity().getApplicationContext(), "삭제되지않았습니다!", Toast.LENGTH_SHORT).show();
                             }
                         }).create().show();
 
@@ -342,9 +352,9 @@ public class Closet extends Activity{
             }
         });
 
+        return view;
     }
 
-    //처음에 뷰 보여주는 함수
     public void viewDisplay(int num){
 
         if(num==0){
@@ -403,7 +413,3 @@ public class Closet extends Activity{
     }
 
 }
-
-
-
-
