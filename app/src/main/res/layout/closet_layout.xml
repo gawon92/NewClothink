@@ -5,70 +5,101 @@
     android:layout_marginTop="30dp"
     android:layout_marginLeft="10dp"
     android:orientation="vertical">
-    <LinearLayout
-        android:id="@+id/linear1"
-        android:gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button
-            android:id="@+id/closet1"
-            android:background="@drawable/closetonbtn"
-            android:visibility="gone"
-            android:layout_width="150dp"
-            android:layout_height="190dp" />
-        <Button
-            android:id="@+id/closet2"
-            android:background="@drawable/closetonbtn"
-            android:visibility="gone"
-            android:layout_width="150dp"
-            android:layout_height="190dp" />
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <LinearLayout
+                android:id="@+id/linear1"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/closet1"
+                    android:background="@drawable/closetonbtn"
+                    android:visibility="gone"
+                    android:layout_width="150dp"
+                    android:layout_height="190dp" />
+                <Button
+                    android:id="@+id/closet2"
+                    android:background="@drawable/closetonbtn"
+                    android:visibility="gone"
+                    android:layout_width="150dp"
+                    android:layout_height="190dp" />
 
-        <Button
-            android:id="@+id/addbtn1"
-            android:background="@drawable/closetplusbtn"
-            android:visibility="invisible"
-            android:layout_width="150dp"
-            android:layout_height="190dp" />
-        <Button
-            android:id="@+id/addbtn2"
-            android:background="@drawable/closetplusbtn"
-            android:visibility="invisible"
-            android:layout_width="150dp"
-            android:layout_height="190dp" />
+                <Button
+                    android:id="@+id/addbtn1"
+                    android:background="@drawable/closetplusbtn"
+                    android:visibility="invisible"
+                    android:layout_width="150dp"
+                    android:layout_height="190dp" />
+                <Button
+                    android:id="@+id/addbtn2"
+                    android:background="@drawable/closetplusbtn"
+                    android:visibility="invisible"
+                    android:layout_width="150dp"
+                    android:layout_height="190dp" />
 
-    </LinearLayout>
+            </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/linear2"
-        android:gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button
-            android:id="@+id/closet3"
-            android:background="@drawable/closetonbtn"
+            <LinearLayout
+                android:id="@+id/linear2"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/closet3"
+                    android:background="@drawable/closetonbtn"
+                    android:visibility="gone"
+                    android:layout_width="150dp"
+                    android:layout_height="190dp" />
+                <Button
+                    android:id="@+id/closet4"
+                    android:background="@drawable/closetonbtn"
+                    android:visibility="gone"
+                    android:layout_width="150dp"
+                    android:layout_height="190dp" />
+
+                <Button
+                    android:id="@+id/addbtn3"
+                    android:background="@drawable/closetplusbtn"
+                    android:visibility="invisible"
+                    android:layout_width="150dp"
+                    android:layout_height="190dp" />
+                <Button
+                    android:id="@+id/addbtn4"
+                    android:background="@drawable/closetplusbtn"
+                    android:visibility="invisible"
+                    android:layout_width="150dp"
+                    android:layout_height="190dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/closetInside"
             android:visibility="gone"
-            android:layout_width="150dp"
-            android:layout_height="190dp" />
-        <Button
-            android:id="@+id/closet4"
-            android:background="@drawable/closetonbtn"
-            android:visibility="gone"
-            android:layout_width="150dp"
-            android:layout_height="190dp" />
+            android:orientation="vertical"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:background="@color/clothinkMainColor">
+            <TextView
+                android:id="@+id/closetName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <Button
+                android:layout_gravity="bottom"
+                android:id="@+id/cancelButton"
+                android:text="닫기"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
-        <Button
-            android:id="@+id/addbtn3"
-            android:background="@drawable/closetplusbtn"
-            android:visibility="invisible"
-            android:layout_width="150dp"
-            android:layout_height="190dp" />
-        <Button
-            android:id="@+id/addbtn4"
-            android:background="@drawable/closetplusbtn"
-            android:visibility="invisible"
-            android:layout_width="150dp"
-            android:layout_height="190dp" />
-    </LinearLayout>
+        </LinearLayout>
+
+    </FrameLayout>
 </LinearLayout>

@@ -12,7 +12,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -29,12 +31,13 @@ import cz.msebera.android.httpclient.Header;
 
 public class ClosetActivity extends Fragment {
 
-    public int count1,count2=0;
+    public int count1=0;
 
     public static int dataNum=0;
 
     private Button[] closet=new Button[4];
     private Button [] addbtn=new Button[4];
+    Button cancelButton;
 
     private ClosetDto infoDto;
 
@@ -47,6 +50,8 @@ public class ClosetActivity extends Fragment {
 
     ClosetDto closetDto;
 
+    LinearLayout closetInside;
+    TextView closetName;
 
     @Nullable
     @Override
@@ -55,7 +60,10 @@ public class ClosetActivity extends Fragment {
         View view=inflater.inflate(R.layout.closet_layout,container,false);
 
         closetInfo=new ArrayList<ClosetDto>();
+        closetInside=(LinearLayout)view.findViewById(R.id.closetInside);
+        closetName=(TextView)view.findViewById(R.id.closetName);
 
+        cancelButton=(Button)view.findViewById(R.id.cancelButton);
 
         RequestParams params = new RequestParams();
         params.add("cmd", "dataGet");
@@ -165,7 +173,23 @@ public class ClosetActivity extends Fragment {
             });
         }
 
-        Log.i(count1+"는"," count1");
+
+       closet[0].setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               closetInside.setVisibility(View.VISIBLE);
+               closetName.setText("옷장 누르면 화면 띄워짐!!!");
+           }
+       });
+
+
+
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                closetInside.setVisibility(View.GONE);
+            }
+        });
 
         closet[0].setOnLongClickListener(new View.OnLongClickListener() {
             @Override

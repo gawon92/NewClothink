@@ -1,10 +1,12 @@
 package gawonjoo0.newclothink;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
@@ -12,6 +14,7 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,7 +35,6 @@ import java.util.StringTokenizer;
 import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends Activity implements View.OnClickListener{
-
 
     Fragment fr1;
     Fragment fr2;
@@ -61,6 +63,35 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     private ArrayList<String> arrayGroup=new ArrayList<String>();;
     private HashMap<String, ArrayList<String>> arrayChild=new HashMap<String, ArrayList<String>>();
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode==KeyEvent.KEYCODE_BACK){
+            AlertDialog.Builder alertDlg=new AlertDialog.Builder(this);
+
+            alertDlg.setMessage("종료 하시겠습니까?");
+            alertDlg.setPositiveButton("예", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    System.exit(0);
+                }
+            });
+            alertDlg.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+
+            AlertDialog alert=alertDlg.create();
+            alert.setTitle("앱 종료");
+            alert.show();
+
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
