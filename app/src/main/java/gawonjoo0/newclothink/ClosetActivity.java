@@ -33,7 +33,8 @@ public class ClosetActivity extends Fragment {
 
     public int count1=0;
 
-    public static int dataNum=0;
+    int dataNum=MainActivity.dataNum;
+
 
     private Button[] closet=new Button[4];
     private Button [] addbtn=new Button[4];
@@ -43,14 +44,14 @@ public class ClosetActivity extends Fragment {
 
     StringTokenizer stk1,stk2;
 
-    ArrayList<String> allList = new ArrayList<String>();
-    public static ArrayList <ClosetDto> closetInfo;
+    ArrayList<String> allList = MainActivity.allList;
+    public static ArrayList <ClosetDto> closetInfo=MainActivity.closetInfo;
 
     private int result=0;
 
     ClosetDto closetDto;
 
-    LinearLayout closetInside;
+    LinearLayout closetInside,buttonLinear;
     TextView closetName;
 
     @Nullable
@@ -58,52 +59,7 @@ public class ClosetActivity extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view=inflater.inflate(R.layout.closet_layout,container,false);
-
-        closetInfo=new ArrayList<ClosetDto>();
-        closetInside=(LinearLayout)view.findViewById(R.id.closetInside);
-        closetName=(TextView)view.findViewById(R.id.closetName);
-
-        cancelButton=(Button)view.findViewById(R.id.cancelButton);
-
-        RequestParams params = new RequestParams();
-        params.add("cmd", "dataGet");
-
-
-        MyFirstRestClient.post("/pb", params, new AsyncHttpResponseHandler() {
-            @Override
-            public void onSuccess(int i, cz.msebera.android.httpclient.Header[] headers, byte[] bytes) {
-
-                String info = new String(bytes);
-                stk1 = new StringTokenizer(info, "^");
-                while (stk1.hasMoreTokens()) {
-                    allList.add(stk1.nextToken());
-                }
-                dataNum = allList.size() - 1;
-
-                for (int k = 0; k < dataNum; k++) {
-
-                    stk2 = new StringTokenizer(allList.get(k), ",");
-                    infoDto = new ClosetDto();
-                    infoDto.setName(stk2.nextToken().trim());
-                    infoDto.setBunho(stk2.nextToken().trim());
-                    infoDto.setAge(Integer.parseInt(stk2.nextToken().trim()));
-                    closetInfo.add(infoDto);
-                    Log.i(closetInfo.get(k).getName(), "");
-                }
-
-
-                viewDisplay(dataNum);
-
-
-            }
-
-            @Override
-            public void onFailure(int i, cz.msebera.android.httpclient.Header[] headers, byte[] bytes, Throwable throwable) {
-                Toast.makeText(getActivity().getApplicationContext(), "연결실패", Toast.LENGTH_SHORT).show();
-
-            }
-        });
-
+        Log.i("dataNum은",dataNum+"");
         closet[0]=(Button) view.findViewById(R.id.closet1);
         closet[1]=(Button) view.findViewById(R.id.closet2);
         closet[2]=(Button) view.findViewById(R.id.closet3);
@@ -113,6 +69,14 @@ public class ClosetActivity extends Fragment {
         addbtn[1]=(Button) view.findViewById(R.id.addbtn2);
         addbtn[2]=(Button) view.findViewById(R.id.addbtn3);
         addbtn[3]=(Button) view.findViewById(R.id.addbtn4);
+
+        viewDisplay(dataNum);
+
+        closetInside=(LinearLayout)view.findViewById(R.id.closetInside);
+        buttonLinear=(LinearLayout)view.findViewById(R.id.buttonLinear);
+        closetName=(TextView)view.findViewById(R.id.closetName);
+
+        cancelButton=(Button)view.findViewById(R.id.cancelButton);
 
 
         for(count1=0;count1<4;count1++){
@@ -128,8 +92,11 @@ public class ClosetActivity extends Fragment {
                                 public void onClick(DialogInterface dialog, int which) {
                                     closetDto = new ClosetDto();
                                     closetDto.setName(closet_name.getText().toString());
-                                    closetDto.setBunho("010-XXXX-XXXX");
-                                    closetDto.setAge(18);
+                                    closetDto.setFur(0);
+                                    closetDto.setKnit(0);
+                                    closetDto.setLeather(0);
+                                    closetDto.setSilk(0);
+
                                     closetInfo.add(closetDto);
 
                                     dataNum += 1;
@@ -178,9 +145,37 @@ public class ClosetActivity extends Fragment {
            @Override
            public void onClick(View v) {
                closetInside.setVisibility(View.VISIBLE);
-               closetName.setText("옷장 누르면 화면 띄워짐!!!");
+               buttonLinear.setVisibility(View.INVISIBLE);
+               closetName.setText(closetInfo.get(0).getName());
            }
        });
+
+        closet[1].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                closetInside.setVisibility(View.VISIBLE);
+                buttonLinear.setVisibility(View.INVISIBLE);
+                closetName.setText(closetInfo.get(1).getName());
+            }
+        });
+
+        closet[2].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                closetInside.setVisibility(View.VISIBLE);
+                buttonLinear.setVisibility(View.INVISIBLE);
+                closetName.setText(closetInfo.get(2).getName());
+            }
+        });
+
+        closet[3].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                closetInside.setVisibility(View.VISIBLE);
+                buttonLinear.setVisibility(View.INVISIBLE);
+                closetName.setText(closetInfo.get(3).getName());
+            }
+        });
 
 
 
@@ -188,6 +183,7 @@ public class ClosetActivity extends Fragment {
             @Override
             public void onClick(View v) {
                 closetInside.setVisibility(View.GONE);
+                buttonLinear.setVisibility(View.VISIBLE);
             }
         });
 

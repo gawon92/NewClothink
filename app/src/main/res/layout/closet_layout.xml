@@ -2,15 +2,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="30dp"
-    android:layout_marginLeft="10dp"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:gravity="center_horizontal|center_vertical">
     <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/buttonLinear"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
             android:orientation="vertical">
             <LinearLayout
                 android:id="@+id/linear1"
@@ -28,6 +29,7 @@
                     android:id="@+id/closet2"
                     android:background="@drawable/closetonbtn"
                     android:visibility="gone"
+                    android:layout_marginLeft="10dp"
                     android:layout_width="150dp"
                     android:layout_height="190dp" />
 
@@ -41,6 +43,7 @@
                     android:id="@+id/addbtn2"
                     android:background="@drawable/closetplusbtn"
                     android:visibility="invisible"
+                    android:layout_marginLeft="10dp"
                     android:layout_width="150dp"
                     android:layout_height="190dp" />
 
@@ -62,6 +65,7 @@
                     android:id="@+id/closet4"
                     android:background="@drawable/closetonbtn"
                     android:visibility="gone"
+                    android:layout_marginLeft="10dp"
                     android:layout_width="150dp"
                     android:layout_height="190dp" />
 
@@ -75,6 +79,7 @@
                     android:id="@+id/addbtn4"
                     android:background="@drawable/closetplusbtn"
                     android:visibility="invisible"
+                    android:layout_marginLeft="10dp"
                     android:layout_width="150dp"
                     android:layout_height="190dp" />
             </LinearLayout>
@@ -85,19 +90,74 @@
             android:id="@+id/closetInside"
             android:visibility="gone"
             android:orientation="vertical"
-            android:layout_width="300dp"
-            android:layout_height="300dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:background="@color/clothinkMainColor">
-            <TextView
-                android:id="@+id/closetName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-            <Button
-                android:layout_gravity="bottom"
-                android:id="@+id/cancelButton"
-                android:text="닫기"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="right">
+                <Button
+                    android:layout_gravity="bottom"
+                    android:id="@+id/cancelButton"
+                    android:text="X"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_horizontal|center_vertical">
+                <TextView
+                    android:id="@+id/closetName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_horizontal">
+                    <Button
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:background="@drawable/waterdrop"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:text="습도"
+                        android:textSize="40sp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_horizontal">
+                    <CheckBox
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="모피"/>
+                    <CheckBox
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="가죽"/>
+                    <CheckBox
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="실크"/>
+                    <CheckBox
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="스웨터"/>
+                </LinearLayout>
+            </LinearLayout>
+
 
         </LinearLayout>
 

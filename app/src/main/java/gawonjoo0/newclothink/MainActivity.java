@@ -49,20 +49,22 @@ public class MainActivity extends Activity implements View.OnClickListener{
     ImageView weatherIconImage;
 
     int threadStopFlag=1;
-    int n=0;
+    private static int n=0;
+    int tipCount=0;
 
-    static int closetCount=0;
+    static int dataNum=0;
     static int washerCount=0;
 
-    String str1="흰옷은 흰옷끼리";
-    String str2="검은옷은 검은옷끼리";
-    String str3="빨간옷은 빨간옷끼리";
-    String str4="노란옷은 노란옷끼리";
 
-//    가워니 즐이다~~~~~~~!
-
-    private ArrayList<String> arrayGroup=new ArrayList<String>();;
+    private ArrayList<String> tipArray=new ArrayList<String>(); //DB에서 tip 가지고오는 Array
+    private ArrayList<String> tipDetailArray=new ArrayList<String>();   //tip Array에서 내용 넣는 Array
+    private ArrayList<String> arrayGroup=new ArrayList<String>();   //tip Array에서 제목 넣는 Array
+    private ArrayList<String> arr=new ArrayList<String>(); //arrChild의 key에 String으로 넣기 위해서 여기 넣엇다가 뺌
     private HashMap<String, ArrayList<String>> arrayChild=new HashMap<String, ArrayList<String>>();
+
+    static ClosetDto infoDto;
+    static ArrayList<String> allList = new ArrayList<String>();
+    static ArrayList <ClosetDto> closetInfo;
 
 
     @Override
@@ -98,15 +100,97 @@ public class MainActivity extends Activity implements View.OnClickListener{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        closetInfo=new ArrayList<ClosetDto>();
+
+        RequestParams params = new RequestParams();
+        params.add("cmd", "tipGet");
+
+
+        MyFirstRestClient.post("/pb", params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int i, cz.msebera.android.httpclient.Header[] headers, byte[] bytes) {
+
+                String info = new String(bytes);
+                StringTokenizer stk1 = new StringTokenizer(info, ":");
+                while (stk1.hasMoreTokens()) {
+                    tipArray.add(stk1.nextToken());
+                }
+
+                n = tipArray.size()-1;
+
+                for (int k = 0; k < n; k++) {
+                    StringTokenizer stk2 = new StringTokenizer(tipArray.get(k).toString().trim(), "^");
+                    while(stk2.hasMoreTokens()){
+                        arrayGroup.add(stk2.nextToken().toString().trim());
+                        tipDetailArray.add(stk2.nextToken().toString().trim());
+                    }
+                }
+
+                RequestParams params2=new RequestParams();
+                params2.add("cmd", "dataGet");
+
+                MyFirstRestClient.post("/pb", params2, new AsyncHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(int i, cz.msebera.android.httpclient.Header[] headers, byte[] bytes) {
+
+                        String info = new String(bytes);
+
+                        if(info.equals("0")){
+                            dataNum=0;
+                        }else{
+                            StringTokenizer stk1 = new StringTokenizer(info, "^");
+                            while (stk1.hasMoreTokens()) {
+                                allList.add(stk1.nextToken());
+                            }
+                            dataNum = allList.size() - 1;
+
+                            for (int k = 0; k < dataNum; k++) {
+
+                                StringTokenizer stk2 = new StringTokenizer(allList.get(k), ",");
+                                infoDto = new ClosetDto();
+                                infoDto.setName(stk2.nextToken().trim());
+                                infoDto.setFur(Integer.parseInt(stk2.nextToken().trim()));
+                                infoDto.setLeather(Integer.parseInt(stk2.nextToken().trim()));
+                                infoDto.setSilk(Integer.parseInt(stk2.nextToken().trim()));
+                                infoDto.setKnit(Integer.parseInt(stk2.nextToken().trim()));
+                                closetInfo.add(infoDto);
+                                Log.i(closetInfo.get(k).getName(), "");
+                            }
+                        }
+
+                        fr1=new ClosetActivity();
+
+                        FragmentManager fm = getFragmentManager();
+                        FragmentTransaction fragmentTransaction = fm.beginTransaction();
+                        fragmentTransaction.replace(R.id.fragmentLayout, fr1);
+                        fragmentTransaction.addToBackStack(null);
+                        fragmentTransaction.commit();
+
+                    }
+
+                    @Override
+                    public void onFailure(int i, cz.msebera.android.httpclient.Header[] headers, byte[] bytes, Throwable throwable) {
+                        Toast.makeText(getApplicationContext(), "연결실패", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+
+            }
+
+            @Override
+            public void onFailure(int i, cz.msebera.android.httpclient.Header[] headers, byte[] bytes, Throwable throwable) {
+                Toast.makeText(getApplicationContext(), "연결실패", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+
         expandableListView=(ExpandableListView) findViewById(R.id.expandableListView1);
         weatherIconImage=(ImageView) findViewById(R.id.weatherIconImage);
 
         closetBtn=(ImageButton) findViewById(R.id.closetBtn);
         washerBtn=(ImageButton) findViewById(R.id.washerBtn);
         settingBtn=(ImageButton) findViewById(R.id.settingBtn);
-
-
-
 
         fr1=new ClosetActivity();
         fr2=new WasherActivity();
@@ -178,10 +262,10 @@ public class MainActivity extends Activity implements View.OnClickListener{
                     @Override
                     public void run() {
                         if(threadStopFlag!=1) {
-                            arrayGroup.clear();
+                            arr.clear();
                             arrayChild.clear();
                             setArrayData();
-                            expandableListView.setAdapter(new ListViewAdapter(getApplicationContext(), arrayGroup, arrayChild));
+                            expandableListView.setAdapter(new ListViewAdapter(getApplicationContext(), arr, arrayChild));
                         }
                     }
                 });
@@ -191,42 +275,19 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
 
     private void setArrayData(){
-//        String tipData="str"+n;   // 저렇게 입력하면 str1의 값을 갖고올 수 있을 줄 알았는데 그냥 문자열 str1 이 들어가서 출력됨 ㅜㅜ
-//        arrayGroup.add(tipData);
 
-        String tipData="";
-
-        if(n==1){
-            tipData=str1;
-        }else if(n==2){
-            tipData=str2;
-        }else if(n==3){
-            tipData=str3;
-        }else if(n==4){
-            tipData=str4;
-        }
-
-        arrayGroup.add(tipData.toString());
         ArrayList<String> arr1=new ArrayList<String>();
+        arr.add(arrayGroup.get(tipCount).toString());
+        arr1.add(tipDetailArray.get(tipCount).toString());
 
-        if(tipData.equals(str1)){
-            arr1.add("하얗게 하얗게 히히히히히");
-        }else if(tipData.equals(str2)){
-            arr1.add("까맣게 까맣게 어둡게 어둡게");
-        }else if(tipData.equals(str3)){
-            arr1.add("빨강은 강렬하죠");
-        }else if(tipData.equals(str4)){
-            arr1.add("미쳐써요 주영이는");
-        }
-
-        arrayChild.put(arrayGroup.get(0),arr1);
+        arrayChild.put(arr.get(0),arr1);
     }
 
     private void updateThread(){
-        if(n==4){   // 정보 데이터 개수까지
-            n=1;
+        if(tipCount==9){   // 정보 데이터 개수까지
+            tipCount=0;
         }else{
-            n++;
+            tipCount++;
         }
     }
 
@@ -261,7 +322,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
                 fragmentTransaction.replace(R.id.fragmentLayout, fr2);
                 washerCount++;
-//                fr=new WasherActivity();
                 break;
             case R.id.settingBtn:
                 settingBtn.setBackgroundResource(R.color.clothinkMainColor);
@@ -275,7 +335,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
                 fragmentTransaction.replace(R.id.fragmentLayout, fr3);
 
-//                fr=new SettingActivity();
                 break;
         }
         fragmentTransaction.addToBackStack(null);

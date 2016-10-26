@@ -4,26 +4,40 @@ package gawonjoo0.newclothink;
  * Created by USER on 2016-10-22.
  */
 public class ClosetDto {
-    private String name, bunho;
-    private int age;
+    private String name;
+    private int fur, leather, silk, knit;
+
+    public void setName(String name) {
+        this.name = name;
+    }
+    public void setFur(int fur) {
+        this.fur = fur;
+    }
+    public void setLeather(int leather) {
+        this.leather = leather;
+    }
+    public void setSilk(int silk) {
+        this.silk = silk;
+    }
+    public void setKnit(int knit) {
+        this.knit = knit;
+    }
 
     public String getName() {
         return name;
     }
-    public void setName(String name) {
-        this.name = name;
+    public int getFur() {
+        return fur;
     }
-    public String getBunho() {
-        return bunho;
+    public int getLeather() {
+        return leather;
     }
-    public void setBunho(String bunho) {
-        this.bunho = bunho;
+    public int getSilk() {
+        return silk;
     }
-    public int getAge() {
-        return age;
+    public int getKnit() {
+        return knit;
     }
-    public void setAge(int age) {
-        this.age = age;
-    }
+
 
 }
