@@ -94,6 +94,11 @@ public class MainActivity extends Activity implements View.OnClickListener{
         return super.onKeyDown(keyCode, event);
     }
 
+    @Override
+    protected void attachBaseContext(Context newBase) { //Application 클래스 (폰트 적용)
+        super.attachBaseContext(TypekitContextWrapper.wrap(newBase));
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -258,11 +263,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
 //        });
 
 
-    }
-
-    @Override
-    protected void attachBaseContext(Context newBase) { //Application 클래스 (폰트 적용)
-        super.attachBaseContext(TypekitContextWrapper.wrap(newBase));
     }
 
     Handler handler1=new Handler(){
