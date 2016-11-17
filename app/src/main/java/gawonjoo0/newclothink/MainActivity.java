@@ -109,7 +109,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         MyFirstRestClient.post("/pb", params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int i, cz.msebera.android.httpclient.Header[] headers, byte[] bytes) {
-
+                Log.i("여기들어옴","팁가져오기 성공");
                 String info = new String(bytes);
                 StringTokenizer stk1 = new StringTokenizer(info, ":");
                 while (stk1.hasMoreTokens()) {
@@ -166,6 +166,31 @@ public class MainActivity extends Activity implements View.OnClickListener{
                         fragmentTransaction.addToBackStack(null);
                         fragmentTransaction.commit();
 
+                        threadStopFlag=0;
+                        new Thread(tipThreadRun).start();
+
+                        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+                            @Override
+                            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                                try {
+                                    threadStopFlag = 1;
+//                    Log.i("그룹상태",""+threadStopFlag);
+                                    Thread.interrupted();
+                                } catch (Throwable t) {
+                                }
+                                return false;
+                            }
+                        });
+
+                        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+                            @Override
+                            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                                threadStopFlag = 0;
+//                Log.i("차일드상태",""+threadStopFlag);
+                                new Thread(tipThreadRun).start();
+                                return false;
+                            }
+                        });
                     }
 
                     @Override
@@ -202,35 +227,35 @@ public class MainActivity extends Activity implements View.OnClickListener{
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
 
-        threadStopFlag=0;
-        new Thread(tipThreadRun).start();
-
+//        threadStopFlag=0;
+//        new Thread(tipThreadRun).start();
+//
         closetBtn.setOnClickListener(this);
         washerBtn.setOnClickListener(this);
         settingBtn.setOnClickListener(this);
 
-        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-            @Override
-            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-                try {
-                    threadStopFlag=1;
-//                    Log.i("그룹상태",""+threadStopFlag);
-                    Thread.interrupted();
-                }catch(Throwable t){
-                }
-                return false;
-            }
-        });
-
-        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                threadStopFlag=0;
-//                Log.i("차일드상태",""+threadStopFlag);
-                new Thread(tipThreadRun).start();
-                return false;
-            }
-        });
+//        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+//            @Override
+//            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+//                try {
+//                    threadStopFlag=1;
+////                    Log.i("그룹상태",""+threadStopFlag);
+//                    Thread.interrupted();
+//                }catch(Throwable t){
+//                }
+//                return false;
+//            }
+//        });
+//
+//        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+//            @Override
+//            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+//                threadStopFlag=0;
+////                Log.i("차일드상태",""+threadStopFlag);
+//                new Thread(tipThreadRun).start();
+//                return false;
+//            }
+//        });
 
 
     }
@@ -275,7 +300,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
 
     private void setArrayData(){
-
         ArrayList<String> arr1=new ArrayList<String>();
         arr.add(arrayGroup.get(tipCount).toString());
         arr1.add(tipDetailArray.get(tipCount).toString());

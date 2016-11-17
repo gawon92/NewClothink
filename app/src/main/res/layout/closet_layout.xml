@@ -92,7 +92,7 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/clothinkMainColor">
+            android:background="@color/clothinkWhite">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -102,6 +102,8 @@
                     android:layout_gravity="bottom"
                     android:id="@+id/cancelButton"
                     android:text="X"
+                    android:textColor="@color/clothinkWhite"
+                    android:background="@color/clothinkMainColor"
                     android:layout_width="40dp"
                     android:layout_height="40dp"/>
             </LinearLayout>
@@ -113,6 +115,7 @@
                 android:gravity="center_horizontal|center_vertical">
                 <TextView
                     android:id="@+id/closetName"
+                    android:textSize="20sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
                 <LinearLayout
@@ -140,18 +143,26 @@
                     android:orientation="horizontal"
                     android:gravity="center_horizontal">
                     <CheckBox
+                        android:buttonTint="#FFCD12"
+                        android:id="@+id/check1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="모피"/>
                     <CheckBox
+                        android:buttonTint="#FFCD12"
+                        android:id="@+id/check2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="가죽"/>
                     <CheckBox
+                        android:buttonTint="#FFCD12"
+                        android:id="@+id/check3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="실크"/>
                     <CheckBox
+                        android:buttonTint="#FFCD12"
+                        android:id="@+id/check4"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="스웨터"/>

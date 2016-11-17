@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -34,7 +35,9 @@ public class ClosetActivity extends Fragment {
     public int count1=0;
 
     int dataNum=MainActivity.dataNum;
+    public static int texture=0;
 
+    CheckBox check1,check2,check3,check4;
 
     private Button[] closet=new Button[4];
     private Button [] addbtn=new Button[4];
@@ -59,7 +62,6 @@ public class ClosetActivity extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view=inflater.inflate(R.layout.closet_layout,container,false);
-        Log.i("dataNum은",dataNum+"");
         closet[0]=(Button) view.findViewById(R.id.closet1);
         closet[1]=(Button) view.findViewById(R.id.closet2);
         closet[2]=(Button) view.findViewById(R.id.closet3);
@@ -70,7 +72,18 @@ public class ClosetActivity extends Fragment {
         addbtn[2]=(Button) view.findViewById(R.id.addbtn3);
         addbtn[3]=(Button) view.findViewById(R.id.addbtn4);
 
+        check1=(CheckBox) view.findViewById(R.id.check1);
+        check2=(CheckBox) view.findViewById(R.id.check2);
+        check3=(CheckBox) view.findViewById(R.id.check3);
+        check4=(CheckBox) view.findViewById(R.id.check4);
+
         viewDisplay(dataNum);
+
+        for(int i=0;i<dataNum;i++){
+            closet[i].setTextColor(Color.BLACK);
+            closet[i].setText(closetInfo.get(i).getName());
+        }
+
 
         closetInside=(LinearLayout)view.findViewById(R.id.closetInside);
         buttonLinear=(LinearLayout)view.findViewById(R.id.buttonLinear);
@@ -116,6 +129,10 @@ public class ClosetActivity extends Fragment {
                                                 Toast.makeText(getActivity().getApplicationContext(), "[ " + closetDto.getName() + " ]의 옷장 만들어짐!", Toast.LENGTH_SHORT).show();
                                             }
 
+                                            closet[dataNum-1].setText(closetInfo.get(dataNum-1).getName());
+
+
+
                                         }
 
                                         @Override
@@ -147,6 +164,8 @@ public class ClosetActivity extends Fragment {
                closetInside.setVisibility(View.VISIBLE);
                buttonLinear.setVisibility(View.INVISIBLE);
                closetName.setText(closetInfo.get(0).getName());
+               viewCheck(0);
+
            }
        });
 
@@ -156,6 +175,7 @@ public class ClosetActivity extends Fragment {
                 closetInside.setVisibility(View.VISIBLE);
                 buttonLinear.setVisibility(View.INVISIBLE);
                 closetName.setText(closetInfo.get(1).getName());
+                viewCheck(1);
             }
         });
 
@@ -165,6 +185,8 @@ public class ClosetActivity extends Fragment {
                 closetInside.setVisibility(View.VISIBLE);
                 buttonLinear.setVisibility(View.INVISIBLE);
                 closetName.setText(closetInfo.get(2).getName());
+                viewCheck(2);
+
             }
         });
 
@@ -174,6 +196,8 @@ public class ClosetActivity extends Fragment {
                 closetInside.setVisibility(View.VISIBLE);
                 buttonLinear.setVisibility(View.INVISIBLE);
                 closetName.setText(closetInfo.get(3).getName());
+                viewCheck(3);
+
             }
         });
 
@@ -182,8 +206,77 @@ public class ClosetActivity extends Fragment {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                closetInside.setVisibility(View.GONE);
-                buttonLinear.setVisibility(View.VISIBLE);
+
+                AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+                dialog.setTitle("저장").setMessage("바뀐 사항을 저장하시겠습니까?")
+                        .setNegativeButton("Yes!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                for(int i=0;i<dataNum;i++){
+                                    if(closetInfo.get(i).getName().equals(closetName.getText())){
+                                        texture=i;
+                                    }
+                                }
+
+                                if(check1.isChecked()){
+                                    closetInfo.get(texture).setFur(1);
+                                }else{
+                                    closetInfo.get(texture).setFur(0);
+                                }
+                                if(check2.isChecked()){
+                                    closetInfo.get(texture).setLeather(1);
+                                }else{
+                                    closetInfo.get(texture).setLeather(0);
+                                }
+                                if(check3.isChecked()){
+                                    closetInfo.get(texture).setSilk(1);
+                                }else{
+                                    closetInfo.get(texture).setSilk(0);
+                                }
+                                if(check4.isChecked()){
+                                    closetInfo.get(texture).setKnit(1);
+                                }else{
+                                    closetInfo.get(texture).setKnit(0);
+                                }
+
+                                RequestParams params = new RequestParams();
+                                params.add("cmd", "closetInfoUpdate");
+                                params.add("name", closetInfo.get(texture).getName());
+                                params.add("fur",closetInfo.get(texture).getFur()+"");
+                                params.add("leather",closetInfo.get(texture).getLeather()+"");
+                                params.add("silk",closetInfo.get(texture).getSilk()+"");
+                                params.add("knit",closetInfo.get(texture).getKnit()+"");
+
+                                MyFirstRestClient.post("/pb", params, new AsyncHttpResponseHandler() {
+                                    @Override
+                                    public void onSuccess(int i, cz.msebera.android.httpclient.Header[] headers, byte[] bytes) {
+                                        String info = new String(bytes);
+                                        result = Integer.parseInt(info.trim());
+                                        if (result != 0) {
+                                            closetInside.setVisibility(View.GONE);
+                                            buttonLinear.setVisibility(View.VISIBLE);
+
+                                            Toast.makeText(getActivity().getApplicationContext(), "저장되었습니다!", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(int i, cz.msebera.android.httpclient.Header[] headers, byte[] bytes, Throwable throwable) {
+                                        Toast.makeText(getActivity().getApplicationContext(), "연결실패", Toast.LENGTH_SHORT).show();
+
+                                    }
+                                });
+
+                            }
+                        })
+                        .setPositiveButton("No!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                closetInside.setVisibility(View.GONE);
+                                buttonLinear.setVisibility(View.VISIBLE);
+                            }
+                        }).create().show();
+
             }
         });
 
@@ -430,6 +523,38 @@ public class ClosetActivity extends Fragment {
             }
 
         }
+
+
+        for(int i=0;i<num;i++){
+            closet[i].setTextColor(Color.BLACK);
+            closet[i].setText(closetInfo.get(i).getName());
+        }
+
+    }
+
+    public void viewCheck(int num){
+
+        if(closetInfo.get(num).getFur()==0){
+            check1.setChecked(false);
+        }else{
+            check1.setChecked(true);
+        }
+        if(closetInfo.get(num).getLeather()==0){
+            check2.setChecked(false);
+        }else{
+            check2.setChecked(true);
+        }
+        if(closetInfo.get(num).getSilk()==0){
+            check3.setChecked(false);
+        }else{
+            check3.setChecked(true);
+        }
+        if(closetInfo.get(num).getKnit()==0){
+            check4.setChecked(false);
+        }else{
+            check4.setChecked(true);
+        }
+
     }
 
 }
