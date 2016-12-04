@@ -1,5 +1,6 @@
 package gawonjoo0.newclothink;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -9,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -28,13 +30,40 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.tsengvn.typekit.TypekitContextWrapper;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends Activity implements View.OnClickListener{
+
+
+    Socket socket = null;
+    BufferedReader socket_in;
+    PrintWriter socket_out;
+
+    Document doc=null;
+
+    float temperature;
+
 
     Fragment fr1;
     Fragment fr2;
@@ -48,6 +77,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     ImageView weatherIconImage;
 
+    TextView currentTempTv;
+
     int threadStopFlag=1;
     private static int n=0;
     int tipCount=0;
@@ -55,6 +86,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
     static int dataNum=0;
     static int washerCount=0;
 
+    public static NodeList nodeList;
+    String data;
 
     private ArrayList<String> tipArray=new ArrayList<String>(); //DB에서 tip 가지고오는 Array
     private ArrayList<String> tipDetailArray=new ArrayList<String>();   //tip Array에서 내용 넣는 Array
@@ -261,8 +294,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
 //                return false;
 //            }
 //        });
-
-
+        ConnectSocket conSock = new ConnectSocket();
+        conSock.setDaemon(true);
+        conSock.start();
     }
 
     Handler handler1=new Handler(){
@@ -281,6 +315,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 try{
                     handler1.sendMessage(handler1.obtainMessage());
                     Thread.sleep(1500);
+
+
                 }catch(Throwable t){}
 
                 runOnUiThread(new Runnable() {
@@ -291,6 +327,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                             arrayChild.clear();
                             setArrayData();
                             expandableListView.setAdapter(new ListViewAdapter(getApplicationContext(), arr, arrayChild));
+                            currentTempTv.setText(""+temperature);
                         }
                     }
                 });
@@ -364,4 +401,104 @@ public class MainActivity extends Activity implements View.OnClickListener{
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
+
+    class ConnectSocket extends Thread {
+        public void run() {
+            try {
+//                DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
+//                DocumentBuilder parser = f.newDocumentBuilder();
+//
+//                Document xmlDoc = null;
+//                String url = "http://www.kma.go.kr/wid/queryDFSRSS.jsp?zone=1121571000";
+//                xmlDoc = parser.parse(url);
+//
+//                Element root = xmlDoc.getDocumentElement();
+
+
+                GetXMLTask task=new GetXMLTask(MainActivity.this);
+                task.execute("http://www.kma.go.kr/wid/queryDFSRSS.jsp?zone=4113564000");
+
+//                socket = new Socket(_SERVER_ADDR, _PORT_NO);
+//                socket_in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf-8"));
+//                socket_out = new PrintWriter(socket.getOutputStream(), true);
+
+                int closet_humidity=0;
+                int laundry_humidity=0;
+                int laundry_day=0;
+                int laundry_time=0;
+
+                try{
+                    while(true){
+                            long now = System.currentTimeMillis();
+
+                        URL url;
+                        try {
+                            url = new URL("http://www.kma.go.kr/wid/queryDFSRSS.jsp?zone=4113564000");
+                            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance().newInstance();
+                            DocumentBuilder db;
+
+                            db = dbf.newDocumentBuilder();
+                            doc = db.parse(new InputSource(url.openStream()));
+                            doc.getDocumentElement().normalize();
+                            nodeList = doc.getElementsByTagName("data");
+                        } catch (Exception e) {
+//                Toast.makeText(getBaseContext(),"ParsingError",Toast.LENGTH_SHORT).show();
+                            Log.i("날씨파싱", "에러");
+                        }
+
+                            Node node = nodeList.item(0);
+                            Element fstElemnt = (Element) node;
+                            NodeList nameList = fstElemnt.getElementsByTagName("temp");
+                            Element nameElement = (Element) nameList.item(0);
+                            nameList = nameElement.getChildNodes();
+
+                           temperature=Float.parseFloat(((Node) nameList.item(0)).getNodeValue().toString());
+
+
+
+
+                    }
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @SuppressLint("NewApi")
+    private class GetXMLTask extends AsyncTask<String, Void, Document> {
+        private Activity context;
+
+        public GetXMLTask(Activity context) {
+            this.context = context;
+        }
+
+        @Override
+        protected Document doInBackground(String... urls) {
+            URL url;
+            try {
+                url = new URL(urls[0]);
+                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance().newInstance();
+                DocumentBuilder db;
+
+                db = dbf.newDocumentBuilder();
+                doc = db.parse(new InputSource(url.openStream()));
+                doc.getDocumentElement().normalize();
+                nodeList = doc.getElementsByTagName("data");
+            } catch (Exception e) {
+//                Toast.makeText(getBaseContext(),"ParsingError",Toast.LENGTH_SHORT).show();
+                Log.i("날씨파싱", "에러");
+            }
+
+            return doc;
+        }
+
+        @Override
+        protected void onPostExecute(Document doc) {
+
+        }
+    }
+
 }
