@@ -466,6 +466,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
             }
         }
     }
+    //a뭐냐
 
     @SuppressLint("NewApi")
     private class GetXMLTask extends AsyncTask<String, Void, Document> {
