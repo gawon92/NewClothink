@@ -2,10 +2,12 @@ package gawonjoo0.newclothink;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -44,6 +46,7 @@ import java.net.Socket;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.StringTokenizer;
@@ -54,7 +57,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends Activity implements View.OnClickListener{
-
+    static Context mainContext;
+    static int alarm_flag1=1, alarm_flag2=1;
     Socket socket = null;
     BufferedReader socket_in;
     PrintWriter socket_out;
@@ -76,13 +80,13 @@ public class MainActivity extends Activity implements View.OnClickListener{
     TextView currentTempTv, minTempTv, maxTempTv;
 
     int threadStopFlag=1;
+    int date_flag=0;    //  1일에 한번만 주기 가져오게 한다
+
     private static int n=0;
     int tipCount=0;
 
     static int dataNum=0;
     static int washerCount=0;
-
-    String data;
 
     private ArrayList<String> tipArray=new ArrayList<String>(); //DB에서 tip 가지고오는 Array
     private ArrayList<String> tipDetailArray=new ArrayList<String>();   //tip Array에서 내용 넣는 Array
@@ -94,6 +98,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
     static ArrayList<String> allList = new ArrayList<String>();
     static ArrayList <ClosetDto> closetInfo;
 
+    static int washerFreq=0;
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -132,7 +137,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        mainContext=getApplicationContext();
         closetInfo=new ArrayList<ClosetDto>();
 
         currentTempTv=(TextView)findViewById(R.id.currentTempTv);
@@ -142,7 +147,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         RequestParams params = new RequestParams();
         params.add("cmd", "tipGet");
 
-
+        //팁 가져오는 부분
         MyFirstRestClient.post("/pb", params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int i, cz.msebera.android.httpclient.Header[] headers, byte[] bytes) {
@@ -163,6 +168,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                     }
                 }
 
+                //입력되어 있는 전체 데이터 가져오는 부분
                 RequestParams params2=new RequestParams();
                 params2.add("cmd", "dataGet");
 
@@ -171,6 +177,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                     public void onSuccess(int i, cz.msebera.android.httpclient.Header[] headers, byte[] bytes) {
 
                         String info = new String(bytes);
+                        //이름, fur, Leather, silk, knit, 아두이노 ^
 
                         if(info.equals("0")){
                             dataNum=0;
@@ -190,6 +197,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                                 infoDto.setLeather(Integer.parseInt(stk2.nextToken().trim()));
                                 infoDto.setSilk(Integer.parseInt(stk2.nextToken().trim()));
                                 infoDto.setKnit(Integer.parseInt(stk2.nextToken().trim()));
+                                infoDto.setArduino(stk2.nextToken().trim());
                                 closetInfo.add(infoDto);
                                 Log.i(closetInfo.get(k).getName(), "");
                             }
@@ -237,6 +245,55 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 });
 
 
+//                Calendar calendar=Calendar.getInstance();
+//                if(calendar.get(Calendar.DATE)==1&&date_flag==0){
+                    RequestParams params3=new RequestParams();
+                    params3.add("cmd", "getWasherFrq");
+
+                    MyFirstRestClient.post("/pb", params3, new AsyncHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int i, cz.msebera.android.httpclient.Header[] headers, byte[] bytes) {
+                            String temp = new String(bytes);
+                            washerFreq=Integer.parseInt(temp.trim());
+//                            Log.i("주기 잘가져와짐", washerFreq+" 이거임");
+                            date_flag=1;
+
+                            //하루 전날 알림
+                            AlarmManager alarmManager=(AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                            Intent intent=new Intent(MainActivity.mainContext,BroadcastClass2.class);
+                            PendingIntent sender=PendingIntent.getBroadcast(MainActivity.mainContext, 0, intent, 0);
+
+                            if(alarm_flag1==1){
+                                Calendar calendar=Calendar.getInstance();
+                                calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), 0);
+
+//                                Date d=new Date(calendar.getTimeInMillis()+((washerFreq-1)*24*60*60*1000));
+//                                calendar.setTime(d);
+                                alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), sender);
+                            }
+
+
+                            //월요일(주의 시작) 알림
+                            if(alarm_flag2==1){
+                                Calendar calendar=Calendar.getInstance();
+                                if(calendar.get(Calendar.DAY_OF_WEEK)==2){
+                                    alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), sender);
+
+                                }
+                            }
+
+
+
+                        }
+
+                        @Override
+                        public void onFailure(int i, cz.msebera.android.httpclient.Header[] headers, byte[] bytes, Throwable throwable) {
+                            Toast.makeText(getApplicationContext(), "연결실패", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+//                }
+
             }
 
             @Override
@@ -264,37 +321,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
 
-//        threadStopFlag=0;
-//        new Thread(tipThreadRun).start();
-//
         closetBtn.setOnClickListener(this);
         washerBtn.setOnClickListener(this);
         settingBtn.setOnClickListener(this);
-
-//        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-//            @Override
-//            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-//                try {
-//                    threadStopFlag=1;
-////                    Log.i("그룹상태",""+threadStopFlag);
-//                    Thread.interrupted();
-//                }catch(Throwable t){
-//                }
-//                return false;
-//            }
-//        });
-//
-//        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-//            @Override
-//            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-//                threadStopFlag=0;
-////                Log.i("차일드상태",""+threadStopFlag);
-//                new Thread(tipThreadRun).start();
-//                return false;
-//            }
-//        });
-
-
 
     }
 
@@ -314,7 +343,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
                     handler1.sendMessage(handler1.obtainMessage());
                     Thread.sleep(1500);
 
-
                 }catch(Throwable t){}
 
                 runOnUiThread(new Runnable() {
@@ -329,8 +357,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                             currentTempTv.setText(getWeatherActivity.getTemperature());
                             minTempTv.setText(getWeatherActivity.getMinTemperature());
                             maxTempTv.setText(getWeatherActivity.getMaxTemperature());
-                            HumidityGet getArduinoActivity=new HumidityGet();
-                            Log.i("습도값",getArduinoActivity.getArduinoData()+"");
+
                         }
                     }
                 });

@@ -4,7 +4,7 @@ package gawonjoo0.newclothink;
  * Created by USER on 2016-10-22.
  */
 public class ClosetDto {
-    private String name;
+    private String name,arduino;
     private int fur, leather, silk, knit;
 
     public void setName(String name) {
@@ -22,6 +22,7 @@ public class ClosetDto {
     public void setKnit(int knit) {
         this.knit = knit;
     }
+    public void setArduino(String arduino){this.arduino=arduino; }
 
     public String getName() {
         return name;
@@ -38,6 +39,6 @@ public class ClosetDto {
     public int getKnit() {
         return knit;
     }
-
+    public String getArduino() { return arduino; }
 
 }

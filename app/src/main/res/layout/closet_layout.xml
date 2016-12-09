@@ -112,7 +112,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:gravity="center_horizontal|center_vertical">
+                android:gravity="center_horizontal|center_vertical"
+                android:background="@drawable/closet_background">
+
                 <TextView
                     android:id="@+id/closetName"
                     android:textSize="20sp"
@@ -129,10 +131,20 @@
                         android:layout_height="70dp"
                         android:background="@drawable/waterdrop"/>
                     <TextView
+                        android:id="@+id/humi_TextView"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:gravity="center_vertical"
                         android:text="습도"
+                        android:textSize="40sp"/>
+                    <TextView
+                        android:id="@+id/humi_State"
+                        android:paddingLeft="10dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:text="안전"
+                        android:textColor="#07621A"
                         android:textSize="40sp"/>
                 </LinearLayout>
 

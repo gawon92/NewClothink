@@ -1,10 +1,17 @@
 package gawonjoo0.newclothink;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,6 +29,7 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.StringTokenizer;
 
 import cz.msebera.android.httpclient.Header;
@@ -47,7 +55,9 @@ public class ClosetActivity extends Fragment {
 
     StringTokenizer stk1,stk2;
 
-    ArrayList<String> allList = MainActivity.allList;
+    String arduino_data="";
+    public static int [] humidity=new int[4];
+
     public static ArrayList <ClosetDto> closetInfo=MainActivity.closetInfo;
 
     private int result=0;
@@ -55,13 +65,18 @@ public class ClosetActivity extends Fragment {
     ClosetDto closetDto;
 
     LinearLayout closetInside,buttonLinear;
-    TextView closetName;
+    TextView closetName, humi_TextView, humi_State;
+
+    //아두이노 이름 매칭해줘야 되서 만든 String배열
+    private String[] arduino_name={"arduino1", "arduino2", "arduino3", "arduino4"};
+    private int[] arduino_state={0,0,0,0};
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view=inflater.inflate(R.layout.closet_layout,container,false);
+
         closet[0]=(Button) view.findViewById(R.id.closet1);
         closet[1]=(Button) view.findViewById(R.id.closet2);
         closet[2]=(Button) view.findViewById(R.id.closet3);
@@ -84,13 +99,53 @@ public class ClosetActivity extends Fragment {
             closet[i].setText(closetInfo.get(i).getName());
         }
 
+        for(int i=0;i<4;i++){
+           humidity[i]=0;
+        }
 
         closetInside=(LinearLayout)view.findViewById(R.id.closetInside);
         buttonLinear=(LinearLayout)view.findViewById(R.id.buttonLinear);
         closetName=(TextView)view.findViewById(R.id.closetName);
+        humi_TextView=(TextView)view.findViewById(R.id.humi_TextView);
+        humi_State=(TextView)view.findViewById(R.id.humi_State);
 
         cancelButton=(Button)view.findViewById(R.id.cancelButton);
 
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    RequestParams params=new RequestParams();
+                    params.add("cmd", "getHumidityArduino");
+
+                    MyFirstRestClient.post("/pb", params, new AsyncHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+
+                            arduino_data = new String(responseBody);
+                            String[] data_split = (arduino_data).split(",");
+//                          //습도값 1, 습도값2, 습도값3, 습도값4 이 순으로 들어옴
+                            for(int i=0;i<4;i++){
+                                humidity[i]=Integer.parseInt(data_split[i].trim());
+                            }
+                        }
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                            Log.i("아두이노 습도 값 가져오기", "실패");
+                        }
+                    });
+
+                    try {
+                        if(humidity[0]>=15||humidity[1]>=15||humidity[2]>=15||humidity[3]>=15){
+                            handler.sendMessage(handler.obtainMessage());
+                        }
+                        Thread.sleep(400);
+                    } catch (Throwable t) {
+                    }
+
+                }
+            }
+        }).start();
 
         for(count1=0;count1<4;count1++){
             addbtn[count1].setOnClickListener(new View.OnClickListener() {
@@ -110,14 +165,28 @@ public class ClosetActivity extends Fragment {
                                     closetDto.setLeather(0);
                                     closetDto.setSilk(0);
 
+                                    int index=0;
+
+                                    if(dataNum==0){
+                                        index=0;
+                                    }else{
+                                        index=findArduino();
+                                    }
+                                    Log.i("인덱스는",index+"");
+                                    closetDto.setArduino(arduino_name[index]);
+                                    Log.i("들어간 아두이노 이름은", arduino_name[index]);
+
                                     closetInfo.add(closetDto);
 
                                     dataNum += 1;
+                                    MainActivity.dataNum=dataNum;
+
                                     viewDisplay(dataNum);
 
                                     RequestParams params = new RequestParams();
                                     params.add("cmd", "closetInfoInsert");
                                     params.add("name", closetDto.getName());
+                                    params.add("arduino",closetDto.getArduino());
 
                                     MyFirstRestClient.post("/pb", params, new AsyncHttpResponseHandler() {
                                         @Override
@@ -130,8 +199,6 @@ public class ClosetActivity extends Fragment {
                                             }
 
                                             closet[dataNum-1].setText(closetInfo.get(dataNum-1).getName());
-
-
 
                                         }
 
@@ -157,15 +224,34 @@ public class ClosetActivity extends Fragment {
             });
         }
 
-
        closet[0].setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
                closetInside.setVisibility(View.VISIBLE);
                buttonLinear.setVisibility(View.INVISIBLE);
                closetName.setText(closetInfo.get(0).getName());
-               viewCheck(0);
 
+               int temp_index=0;
+               for(int i=0;i<arduino_name.length;i++){
+                   if(closetInfo.get(0).getArduino().equals(arduino_name[i])){
+                       temp_index=i;
+                       break;
+                   }
+               }
+               humi_TextView.setText(humidity[temp_index]+"");
+
+               if(humidity[temp_index]>=15&&humidity[temp_index]<20){
+                   humi_State.setText("주의");
+                   humi_State.setTextColor(Color.parseColor("#FFCD12"));
+               }else if(humidity[temp_index]>=20){
+                   humi_State.setText("위험");
+                   humi_State.setTextColor(Color.RED);
+               }else{
+                   humi_State.setText("안전");
+                   humi_State.setTextColor(Color.parseColor("#07621A"));
+               }
+
+               viewCheck(0);
            }
        });
 
@@ -175,6 +261,27 @@ public class ClosetActivity extends Fragment {
                 closetInside.setVisibility(View.VISIBLE);
                 buttonLinear.setVisibility(View.INVISIBLE);
                 closetName.setText(closetInfo.get(1).getName());
+
+                int temp_index=0;
+                for(int i=0;i<arduino_name.length;i++){
+                    if(closetInfo.get(1).getArduino().equals(arduino_name[i])){
+                        temp_index=i;
+                        break;
+                    }
+                }
+                humi_TextView.setText(humidity[temp_index]+"");
+
+                if(humidity[temp_index]>=15&&humidity[temp_index]<20){
+                    humi_State.setText("주의");
+                    humi_State.setTextColor(Color.parseColor("#FFCD12"));
+                }else if(humidity[temp_index]>=20){
+                    humi_State.setText("위험");
+                    humi_State.setTextColor(Color.RED);
+                }else{
+                    humi_State.setText("안전");
+                    humi_State.setTextColor(Color.parseColor("#07621A"));
+                }
+
                 viewCheck(1);
             }
         });
@@ -185,6 +292,27 @@ public class ClosetActivity extends Fragment {
                 closetInside.setVisibility(View.VISIBLE);
                 buttonLinear.setVisibility(View.INVISIBLE);
                 closetName.setText(closetInfo.get(2).getName());
+
+                int temp_index=0;
+                for(int i=0;i<arduino_name.length;i++){
+                    if(closetInfo.get(2).getArduino().equals(arduino_name[i])){
+                        temp_index=i;
+                        break;
+                    }
+                }
+                humi_TextView.setText(humidity[temp_index]+"");
+
+                if(humidity[temp_index]>=15&&humidity[temp_index]<20){
+                    humi_State.setText("주의");
+                    humi_State.setTextColor(Color.parseColor("#FFCD12"));
+                }else if(humidity[temp_index]>=20){
+                    humi_State.setText("위험");
+                    humi_State.setTextColor(Color.RED);
+                }else{
+                    humi_State.setText("안전");
+                    humi_State.setTextColor(Color.parseColor("#07621A"));
+                }
+
                 viewCheck(2);
 
             }
@@ -196,6 +324,25 @@ public class ClosetActivity extends Fragment {
                 closetInside.setVisibility(View.VISIBLE);
                 buttonLinear.setVisibility(View.INVISIBLE);
                 closetName.setText(closetInfo.get(3).getName());
+
+                int temp_index=0;
+                for(int i=0;i<arduino_name.length;i++){
+                    if(closetInfo.get(3).getArduino().equals(arduino_name[i])){
+                        temp_index=i;
+                        break;
+                    }
+                }
+                humi_TextView.setText(humidity[temp_index]+"");
+                if(humidity[temp_index]>=15&&humidity[temp_index]<20){
+                    humi_State.setText("주의");
+                    humi_State.setTextColor(Color.parseColor("#FFCD12"));
+                }else if(humidity[temp_index]>=20){
+                    humi_State.setText("위험");
+                    humi_State.setTextColor(Color.RED);
+                }else{
+                    humi_State.setText("안전");
+                    humi_State.setTextColor(Color.parseColor("#07621A"));
+                }
                 viewCheck(3);
 
             }
@@ -301,8 +448,10 @@ public class ClosetActivity extends Fragment {
                                         if (result != 0) {
                                             closetInfo.remove(0);
                                             dataNum -= 1;
+                                            MainActivity.dataNum=dataNum;
                                             viewDisplay(dataNum);
                                             Toast.makeText(getActivity().getApplicationContext(), "삭제되었습니다!", Toast.LENGTH_SHORT).show();
+                                            arduino_state[0]=0;
                                         }
                                     }
 
@@ -349,6 +498,8 @@ public class ClosetActivity extends Fragment {
                                             dataNum -= 1;
                                             viewDisplay(dataNum);
                                             Toast.makeText(getActivity().getApplicationContext(), "삭제되었습니다!", Toast.LENGTH_SHORT).show();
+                                            arduino_state[1]=0;
+
                                         }
                                     }
 
@@ -396,6 +547,8 @@ public class ClosetActivity extends Fragment {
                                             dataNum -= 1;
                                             viewDisplay(dataNum);
                                             Toast.makeText(getActivity().getApplicationContext(), "삭제되었습니다!", Toast.LENGTH_SHORT).show();
+                                            arduino_state[2]=0;
+
                                         }
                                     }
 
@@ -442,6 +595,8 @@ public class ClosetActivity extends Fragment {
                                             dataNum -= 1;
                                             viewDisplay(dataNum);
                                             Toast.makeText(getActivity().getApplicationContext(), "삭제되었습니다!", Toast.LENGTH_SHORT).show();
+                                            arduino_state[3]=0;
+
                                         }
                                     }
 
@@ -468,6 +623,44 @@ public class ClosetActivity extends Fragment {
         return view;
     }
 
+    Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+
+            //10이상이면 주의
+            //20이상이면 위험
+            for(int i=0;i<dataNum;i++){
+                for(int k=0;k<arduino_name.length;k++)
+                if(closetInfo.get(i).getArduino().equals(arduino_name[k])){
+
+                    if(humidity[k]>=15){
+                        closet[i].setBackgroundResource(R.drawable.closeton_danger_btn);
+//                        new SetAlarmClass(MainActivity.mainContext);
+
+                        if(arduino_state[i]!=1){
+                            AlarmManager alarmManager=(AlarmManager) MainActivity.mainContext.getSystemService(Context.ALARM_SERVICE);
+                            Intent intent=new Intent(MainActivity.mainContext,BroadcastClass.class);
+
+                            PendingIntent sender=PendingIntent.getBroadcast(MainActivity.mainContext,0,intent,0);
+                            Calendar calendar=Calendar.getInstance();
+                            calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), 0);
+                            alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), sender);
+                            arduino_state[i]=1;
+                        }
+
+                    }else{
+                        closet[i].setBackgroundResource(R.drawable.closetonbtn);
+                        arduino_state[i]=0;
+
+                    }
+                }
+            }
+
+
+
+        }
+    };
+
     public void viewDisplay(int num){
 
         if(num==0){
@@ -490,6 +683,7 @@ public class ClosetActivity extends Fragment {
             closet[1].setVisibility(View.GONE);
             closet[2].setVisibility(View.GONE);
             closet[3].setVisibility(View.GONE);
+
         }else if(num==2){
             addbtn[0].setVisibility(View.GONE);
             addbtn[1].setVisibility(View.GONE);
@@ -555,6 +749,29 @@ public class ClosetActivity extends Fragment {
             check4.setChecked(true);
         }
 
+    }
+
+    //사용하지 않고 있는 아두이노 이름 찾는 함수
+    public int findArduino(){
+
+        int [] temp_index={0,0,0,0};
+        ArrayList<Integer> arduino_index = new ArrayList<Integer>();
+
+        for(int i=0;i<arduino_name.length;i++){
+            for(int k=0;k<closetInfo.size();k++){
+                if(arduino_name[i].equals(closetInfo.get(k).getArduino())){
+                    temp_index[i]=1;
+                }
+            }
+        }
+
+        for(int i=0;i<temp_index.length;i++){
+            if(temp_index[i]==0){
+                arduino_index.add(i);
+            }
+        }
+
+        return arduino_index.get(0);
     }
 
 }

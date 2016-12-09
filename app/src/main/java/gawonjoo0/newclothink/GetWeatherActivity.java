@@ -6,16 +6,23 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import java.io.BufferedReader;
+import java.net.Socket;
 import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by USER on 2016-12-04.
@@ -59,40 +66,33 @@ public class GetWeatherActivity{
                     Element nameElement1 = (Element) nameList.item(0);
                     nameList = nameElement1.getChildNodes();
 
-
-                    NodeList max_temperature=fstElemnt.getElementsByTagName("tmx");
-                    Element nameElement2 = (Element) max_temperature.item(0);
-                    max_temperature=nameElement2.getChildNodes();
-
-                    NodeList min_temperature=fstElemnt.getElementsByTagName("tmn");
-                    Element nameElement3 = (Element) min_temperature.item(0);
-                    min_temperature=nameElement3.getChildNodes();
-
-
                     temper=Float.parseFloat(((Node) nameList.item(0)).getNodeValue().toString());
-                    String max=((Node) max_temperature.item(0)).getNodeValue().toString();
-                    String min=((Node) min_temperature.item(0)).getNodeValue().toString();
 
-
-                    if(max.equals("-999.0")||min.equals("-999.0")){
-                        node = nodeList.item(2);
+                    int i=0;
+                    while(i<19) {    //sequence="18"까지 loop문 돌린다.
+                        node = nodeList.item(i);
                         fstElemnt = (Element) node;
 
-                        max_temperature=fstElemnt.getElementsByTagName("tmx");
-                        nameElement2 = (Element) max_temperature.item(0);
-                        max_temperature=nameElement2.getChildNodes();
+                        NodeList max_temperature = fstElemnt.getElementsByTagName("tmx");
+                        Element max_element = (Element) max_temperature.item(0);
+                        max_temperature = max_element.getChildNodes();
 
-                        min_temperature=fstElemnt.getElementsByTagName("tmn");
-                        nameElement3 = (Element) min_temperature.item(0);
-                        min_temperature=nameElement3.getChildNodes();
+                        NodeList min_temperature = fstElemnt.getElementsByTagName("tmn");
+                        Element min_element = (Element) min_temperature.item(0);
+                        min_temperature = min_element.getChildNodes();
 
-                        max_temper=((Node) max_temperature.item(0)).getNodeValue().toString();
-                        min_temper=((Node) min_temperature.item(0)).getNodeValue().toString();
+                        max_temper = ((Node) max_temperature.item(0)).getNodeValue().toString();
+                        min_temper = ((Node) min_temperature.item(0)).getNodeValue().toString();
 
-                    }else{
-                        max_temper=((Node) max_temperature.item(0)).getNodeValue().toString();
-                        min_temper=((Node) min_temperature.item(0)).getNodeValue().toString();
+                        if ((max_temper.equals("-999.0")) || (min_temper.equals("-999.0"))) {
+                            max_temper = "미제공";
+                            min_temper = "미제공";
+                            i++;
+                        } else {
+                            break;
+                        }
                     }
+
 //                    Log.i("지금 기온은", "잘찍힘"+temper);
 //                    Log.i("최고 기온은", "잘찍힘"+max_temper);
 //                    Log.i("최저 기온은", "잘찍힘"+min_temper);

@@ -2,34 +2,222 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:gravity="center_horizontal|center_vertical">
 
     <LinearLayout
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:gravity="left">
+
+
+        <TextView
+            android:layout_marginLeft="15dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:text="옷장 한 눈에 보기"/>
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="25dp"
+            android:src="@drawable/setting_icon_01"
+            android:scaleType="centerCrop"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal|center_vertical">
+
+        <LinearLayout
+            android:id="@+id/noClosetLinear"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:gravity="center_vertical">
+            <TextView
+                android:gravity="center"
+                android:layout_marginLeft="15dp"
+                android:layout_width="220dp"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:text="등록된 옷장이 없습니다."/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:visibility="invisible"
+            android:id="@+id/closetLinear1"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:gravity="center_vertical">
+            <TextView
+                android:id="@+id/closetName1"
+                android:layout_marginLeft="15dp"
+                android:layout_width="220dp"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:text="옷장1"/>
+            <TextView
+                android:id="@+id/closetState1"
+                android:layout_marginLeft="15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:textColor="#07621A"
+                android:text="양호"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:visibility="invisible"
+            android:id="@+id/closetLinear2"
+            android:layout_marginTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:gravity="center_vertical">
+            <TextView
+                android:id="@+id/closetName2"
+                android:layout_marginLeft="15dp"
+                android:layout_width="220dp"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:text="옷장2"/>
+            <TextView
+                android:id="@+id/closetState2"
+                android:layout_marginLeft="15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:textColor="#07621A"
+                android:text="양호"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:visibility="invisible"
+            android:id="@+id/closetLinear3"
+            android:layout_marginTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:gravity="center_vertical">
+            <TextView
+                android:id="@+id/closetName3"
+                android:layout_marginLeft="15dp"
+                android:layout_width="220dp"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:text="옷장3"/>
+            <TextView
+                android:id="@+id/closetState3"
+                android:layout_marginLeft="15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:textColor="#07621A"
+                android:text="양호"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:gravity="center_horizontal">
 
         <TextView
-            android:layout_width="150dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="20sp"
-            android:text="알림 설정"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:text="설정"/>
-        <Switch
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:text="해제"/>
+            android:textStyle="bold"
+            android:text="지난 달 세탁 주기는 "/>
 
+        <TextView
+            android:id="@+id/washerFreqTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#ffcd12"
+            android:text="00"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:text="일입니다!"/>
 
     </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:text="알림 설정"/>
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="25dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/setting_icon_02"/>
+
+        <Switch
+            android:id="@+id/set_alarm_switch"
+            android:layout_marginLeft="120dp"
+            android:checked="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="230dp"
+            android:layout_height="wrap_content"
+            android:textSize="17sp"
+            android:text="첫주 알림"/>
+
+        <Switch
+            android:id="@+id/set_week_alarm_switch"
+            android:checked="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_marginTop="5dp"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="230dp"
+            android:layout_height="wrap_content"
+            android:textSize="17sp"
+            android:text="전날 알림"/>
+
+        <Switch
+            android:id="@+id/set_before_alarm_switch"
+            android:checked="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
 
 </LinearLayout>
